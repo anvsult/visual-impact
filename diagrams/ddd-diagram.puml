@@ -1,0 +1,320 @@
+@startuml
+!theme plain
+hide circle
+top to bottom direction
+!pragma useVerticalIf on
+skinparam dpi 350
+skinparam packageStyle rectangle
+skinparam rectangle {
+  BackgroundColor #f7f4eb
+  BorderColor Black
+}
+
+' === DDD DEFINITIONS ===
+!define ENTITY(e) class e <<Entity>>
+!define AGGREGATE(a) class a <<Aggregate>>
+!define AGGREGATE_ROOT(ar) class ar <<Aggregate Root>>
+!define VALUE_OBJECT(vo) class vo <<Value Object>>
+!define ENUM(enum) class enum <<Enum>>
+
+title Visual Impact Platform - Domain Driven Design Context Map
+
+' ===============================
+' AUTHENTICATION & IDENTITY
+' ===============================
+package "Authentication & Identity Subdomain" #LightSteelBlue {
+  AGGREGATE_ROOT(UserAccount) #LightBlue {
+    auth0UserId: String
+    name: String
+    contactNumber: String
+    email: String
+  }
+
+  VALUE_OBJECT(UserCredentials) #Bisque {
+    username: String
+    passwordHash: String
+  }
+
+  VALUE_OBJECT(UserIdentifier) #Bisque {
+    userId: UUID
+  }
+
+  ENUM(role) #Orange {
+    ADVERTISER
+    MEDIA_OWNER
+    ADMIN
+  }
+
+  ENUM(languagePreference) #Orange {
+    ENGLISH
+    FRENCH
+  }
+
+  UserAccount "1" o--> "1" UserCredentials
+  UserAccount "1" o--> "1" UserIdentifier
+  UserAccount "1" o--> "1" role
+  UserAccount "1" o--> "1" languagePreference
+}
+
+' ===============================
+' ADVERTISER MANAGEMENT
+' ===============================
+package "Advertiser Management Subdomain" #LightYellow {
+  AGGREGATE_ROOT(AdvertiserCompany) #LightBlue {
+    companyName: String
+    allowedScreenTimePercentage: Decimal
+    companyType: Enum(Small|Medium|Large)
+  }
+
+  ENTITY(AdPlan) #LightBlue {
+    planId: UUID
+    maxScreensAllowed: Int
+    monthlyBudget: Decimal
+  }
+
+  VALUE_OBJECT(CompanyVerification) #Bisque {
+    verified: Boolean
+    verifiedDate: Date
+  }
+
+  AdvertiserCompany "1" o--> "1..*" AdPlan
+  AdvertiserCompany "1" o--> "1" CompanyVerification
+}
+
+' ===============================
+' MEDIA OWNER MANAGEMENT
+' ===============================
+package "Media Owner Management Subdomain" #LightGreen {
+  AGGREGATE_ROOT(MediaOwner) #LightBlue {
+    businessName: String
+  }
+
+  ENTITY(MediaAsset) #LightBlue {
+    title: String
+    type: Enum(DigitalScreen|Poster|Billboard|Wall|Menu)
+    estimatedWeeklyViews: Int
+    pricePerWeek: Decimal
+    status: Enum(Active|Inactive|Pending|Rejected)
+  }
+
+
+  VALUE_OBJECT(MediaIdentifier) #Bisque {
+    mediaId: UUID
+  }
+
+  VALUE_OBJECT(MediaLocation) #Bisque {
+    latitude: Float
+    longitude: Float
+    address: String
+  }
+
+  VALUE_OBJECT(MediaSize) #Bisque {
+    width: Float
+    height: Float
+    unit: Enum(foot^2)
+  }
+
+  VALUE_OBJECT(RevenueSummary) #Bisque {
+    totalRevenue: Decimal
+    lastPaymentDate: Date
+  }
+
+  MediaOwner "1" o--> "1..*" MediaAsset
+  MediaOwner "1" o--> "1..*" RevenueSummary
+  MediaAsset "1" o--> "1..*" MediaLocation
+  MediaAsset "1" o--> "1" MediaSize
+  MediaAsset "1" o--> "1" MediaIdentifier
+}
+
+' ===============================
+' ADVERTISEMENT & BOOKING
+' ===============================
+package "Advertisement & Booking Subdomain" #LightCoral {
+  AGGREGATE_ROOT(Advertisement) #LightBlue {
+    startDate: Date
+    endDate: Date
+    budget: Decimal
+    status: Enum(Pending|Active|Rejected|Expired)
+  }
+
+  ENTITY(AdPlacement) #LightBlue {
+    placementId: UUID
+    screenTimeMinutes: Int
+    cost: Decimal
+    approvedByOwner: Boolean
+  }
+
+  VALUE_OBJECT(AdIdentifier) #Bisque {
+    adId: UUID
+  }
+
+  VALUE_OBJECT(ImpressionMetrics) #Bisque {
+    estimatedWeeklyImpressions: Int
+    actualImpressions: Int
+  }
+
+  VALUE_OBJECT(CostMetrics) #Bisque {
+    CPM: Decimal
+    totalSpend: Decimal
+  }
+
+  Advertisement "1" o--> "1" AdIdentifier
+  Advertisement "1" o--> "1..*" AdPlacement
+  Advertisement "1" o--> "1" ImpressionMetrics
+  Advertisement "1" o--> "1" CostMetrics
+}
+
+' ===============================
+' TRANSACTIONS
+' ===============================
+package "Transactions Subdomain" #LightPink {
+  AGGREGATE_ROOT(Transaction) #LightBlue {
+    amount: Decimal
+    currency: String
+    timestamp: DateTime
+    status: Enum(Success|Failed|Pending)
+  }
+
+  ENTITY(Invoice) #LightBlue {
+    invoiceId: UUID
+    dueDate: Date
+    paid: Boolean
+  }
+
+VALUE_OBJECT(TransactionIdentifier) #Bisque {
+    transactionId: UUID
+  }
+
+  VALUE_OBJECT(PaymentMethod) #Bisque {
+    methodType: Enum(CreditCard|PayPal|Stripe)
+    last4Digits: String
+  }
+
+
+
+  VALUE_OBJECT(TransactionInfo) #Bisque {
+    companyName: String
+    taxNumber: String
+    billingAddress: String
+  }
+
+  Transaction "1" o--> "1" Invoice
+  Transaction "1" o--> "1" PaymentMethod
+  Transaction "1" o--> "1" TransactionInfo
+  Transaction "1" o--> "1" TransactionIdentifier
+  Transaction "*" o--> "1" UserIdentifier
+}
+
+' ===============================
+' ADMIN & MODERATION
+' ===============================
+package "Admin & Moderation Subdomain" #LightCyan {
+  AGGREGATE_ROOT(Admin) #LightBlue {
+    permissions: Enum
+  }
+
+  ENTITY(VerificationRequest) #LightBlue {
+    requestId: UUID
+    companyId: UUID
+    submittedDocs: URL
+  }
+
+  ENTITY(ContentModeration) #LightBlue {
+    moderationId: UUID
+    mediaId: UUID
+    reason: String
+
+  }
+
+  VALUE_OBJECT(AdminDecision) #Bisque {
+    decisionDate: Date
+    decisionBy: UUID
+    notes: String
+  }
+
+ ENUM(Status) #Orange {
+     PENDING
+     APPROVED
+     REJECTED
+   }
+
+   ENUM(Decision) #Orange {
+        ACCEPTED
+        DENIED
+      }
+
+  ContentModeration "1..*" o--> "1" AdminDecision
+  Admin o--> VerificationRequest
+  Admin o--> ContentModeration
+  VerificationRequest o--> Status
+  ContentModeration o--> Decision
+}
+
+' ===============================
+' REPORTING & ANALYTICS
+' ===============================
+package "Reporting & Analytics Subdomain" #LightGray {
+  AGGREGATE_ROOT(Report) #LightBlue {
+    reportId: UUID
+    reportType: Enum(Admin|Advertiser|MediaOwner|Advertisement)
+    generatedAt: DateTime
+  }
+
+  ENTITY(ReportData) #LightBlue {
+    dataId: UUID
+    content: JSON
+  }
+
+  VALUE_OBJECT(RevenueMetrics) #Bisque {
+    dailyRevenue: Decimal
+    weeklyRevenue: Decimal
+  }
+
+  VALUE_OBJECT(PerformanceMetrics) #Bisque {
+    totalImpressions: Int
+    averageCPM: Decimal
+  }
+
+  Report "1" o--> "1" ReportData
+  Report "1" o--> "1" RevenueMetrics
+  Report "1" o--> "1" PerformanceMetrics
+}
+
+' ===============================
+' File Handling
+' ===============================
+package "File Subdomain" #LightGray {
+   ENTITY(File) #LightBlue {
+      fileURL: string
+      fileName: string
+   }
+
+   VALUE_OBJECT(fileIdentifier) #Bisque {
+      fileId: UUID
+   }
+
+   File "1" o--> "1" fileIdentifier
+}
+
+' ===============================
+' CROSS DOMAIN RELATIONSHIPS
+' ===============================
+CompanyVerification o--> UserIdentifier
+AdvertiserCompany o--> UserIdentifier
+MediaOwner o--> UserIdentifier
+Admin o--> UserIdentifier
+Report o--> UserIdentifier
+
+Advertisement o--> fileIdentifier
+Report o--> fileIdentifier
+MediaAsset o--> fileIdentifier
+UserAccount o--> fileIdentifier
+
+AdPlan o--> AdIdentifier
+AdPlacement o--> MediaIdentifier
+
+Advertisement o--> MediaAsset
+AdIdentifier o--> Transaction
+MediaIdentifier o--> Transaction
+
+@enduml
