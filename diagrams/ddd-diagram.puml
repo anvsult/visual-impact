@@ -82,10 +82,10 @@ package "Advertiser Management Subdomain" #LightYellow {
 }
 
 ' ===============================
-' MEDIA OWNER MANAGEMENT
+' AD SPACE OWNER MANAGEMENT
 ' ===============================
-package "Media Owner Management Subdomain" #LightGreen {
-  AGGREGATE_ROOT(MediaOwner) #LightBlue {
+package "Ad Space Owner Management Subdomain" #LightGreen {
+  AGGREGATE_ROOT(AdSpaceOwner) #LightBlue {
     businessName: String
   }
 
@@ -119,8 +119,8 @@ package "Media Owner Management Subdomain" #LightGreen {
     lastPaymentDate: Date
   }
 
-  MediaOwner "1" o--> "1..*" MediaAsset
-  MediaOwner "1" o--> "1..*" RevenueSummary
+  AdSpaceOwner "1" o--> "1..*" MediaAsset
+  AdSpaceOwner "1" o--> "1..*" RevenueSummary
   MediaAsset "1" o--> "1..*" MediaLocation
   MediaAsset "1" o--> "1" MediaSize
   MediaAsset "1" o--> "1" MediaIdentifier
@@ -256,7 +256,7 @@ package "Admin & Moderation Subdomain" #LightCyan {
 package "Reporting & Analytics Subdomain" #LightGray {
   AGGREGATE_ROOT(Report) #LightBlue {
     reportId: UUID
-    reportType: Enum(Admin|Advertiser|MediaOwner|Advertisement)
+    reportType: Enum(Admin|Advertiser|AdSpaceOwner|Advertisement)
     generatedAt: DateTime
   }
 
@@ -301,7 +301,7 @@ package "File Subdomain" #LightGray {
 ' ===============================
 CompanyVerification o--> UserIdentifier
 AdvertiserCompany o--> UserIdentifier
-MediaOwner o--> UserIdentifier
+AdSpaceOwner o--> UserIdentifier
 Admin o--> UserIdentifier
 Report o--> UserIdentifier
 
