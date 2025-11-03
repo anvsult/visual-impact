@@ -63,7 +63,6 @@ package "Advertiser Management Subdomain" #LightYellow {
   AGGREGATE_ROOT(AdvertiserCompany) #LightBlue {
     companyName: String
     allowedScreenTimePercentage: Decimal
-    companyType: Enum(Small|Medium|Large)
   }
 
   ENTITY(AdPlan) #LightBlue {
@@ -77,8 +76,15 @@ package "Advertiser Management Subdomain" #LightYellow {
     verifiedDate: Date
   }
 
+  ENUM (CompanyType) #Orange {
+      SMALL
+      MEDIUM
+      LARGE
+   }
+
   AdvertiserCompany "1" o--> "1..*" AdPlan
   AdvertiserCompany "1" o--> "1" CompanyVerification
+  AdvertiserCompany "1" o--> "1" CompanyType
 }
 
 ' ===============================
@@ -91,10 +97,8 @@ package "Ad Space Owner Management Subdomain" #LightGreen {
 
   ENTITY(MediaAsset) #LightBlue {
     title: String
-    type: Enum(DigitalScreen|Poster|Billboard|Wall|Menu)
     estimatedWeeklyViews: Int
     pricePerWeek: Decimal
-    status: Enum(Active|Inactive|Pending|Rejected)
   }
 
 
@@ -119,11 +123,25 @@ package "Ad Space Owner Management Subdomain" #LightGreen {
     lastPaymentDate: Date
   }
 
+  ENUM (Status) #Orange {
+      ACTIVE
+      INACTIVE
+      PENDING
+      REJECTED
+   }
+
+   ENUM (Type) #Orange {
+      DIGITAL_SCREEN
+      PHYSICAL POSTER
+   }
+
   AdSpaceOwner "1" o--> "1..*" MediaAsset
   AdSpaceOwner "1" o--> "1..*" RevenueSummary
   MediaAsset "1" o--> "1..*" MediaLocation
   MediaAsset "1" o--> "1" MediaSize
   MediaAsset "1" o--> "1" MediaIdentifier
+  MediaAsset "1" o--> "1" Status
+  MediaAsset "1" o--> "1" Type
 }
 
 ' ===============================
@@ -134,7 +152,6 @@ package "Advertisement & Booking Subdomain" #LightCoral {
     startDate: Date
     endDate: Date
     budget: Decimal
-    status: Enum(Pending|Active|Rejected|Expired)
   }
 
   ENTITY(AdPlacement) #LightBlue {
@@ -158,10 +175,18 @@ package "Advertisement & Booking Subdomain" #LightCoral {
     totalSpend: Decimal
   }
 
+  ENUM(Status) #Orange {
+      ACTIVE
+      INACTIVE
+      PENDING
+      REJECTED
+   }
+
   Advertisement "1" o--> "1" AdIdentifier
   Advertisement "1" o--> "1..*" AdPlacement
   Advertisement "1" o--> "1" ImpressionMetrics
   Advertisement "1" o--> "1" CostMetrics
+    Advertisement "1" o--> "1" Status
 }
 
 ' ===============================
@@ -172,7 +197,6 @@ package "Transactions Subdomain" #LightPink {
     amount: Decimal
     currency: String
     timestamp: DateTime
-    status: Enum(Success|Failed|Pending)
   }
 
   ENTITY(Invoice) #LightBlue {
@@ -198,11 +222,18 @@ VALUE_OBJECT(TransactionIdentifier) #Bisque {
     billingAddress: String
   }
 
+  ENUM (Status) #Orange {
+      SUCCESS
+      FAILED
+      PENDING
+   }
+
   Transaction "1" o--> "1" Invoice
   Transaction "1" o--> "1" PaymentMethod
   Transaction "1" o--> "1" TransactionInfo
   Transaction "1" o--> "1" TransactionIdentifier
   Transaction "*" o--> "1" UserIdentifier
+  Transaction "1" o--> "1" Status
 }
 
 ' ===============================
@@ -246,8 +277,8 @@ package "Admin & Moderation Subdomain" #LightCyan {
   ContentModeration "1..*" o--> "1" AdminDecision
   Admin o--> VerificationRequest
   Admin o--> ContentModeration
-  VerificationRequest o--> Status
-  ContentModeration o--> Decision
+  VerificationRequest "1" o--> "1" Status
+  ContentModeration "1" o--> "1" Decision
 }
 
 ' ===============================
@@ -256,7 +287,6 @@ package "Admin & Moderation Subdomain" #LightCyan {
 package "Reporting & Analytics Subdomain" #LightGray {
   AGGREGATE_ROOT(Report) #LightBlue {
     reportId: UUID
-    reportType: Enum(Admin|Advertiser|AdSpaceOwner|Advertisement)
     generatedAt: DateTime
   }
 
@@ -275,9 +305,17 @@ package "Reporting & Analytics Subdomain" #LightGray {
     averageCPM: Decimal
   }
 
+  ENUM(reportType) #Orange {
+    ADMIN
+    ADVERTISER
+    AD_SPACE_OWNER
+    ADVERTISEMENT
+  }
+
   Report "1" o--> "1" ReportData
   Report "1" o--> "1" RevenueMetrics
   Report "1" o--> "1" PerformanceMetrics
+  Report "1" o--> "1" reportType
 }
 
 ' ===============================

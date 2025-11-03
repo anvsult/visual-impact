@@ -1,64 +1,73 @@
 @startuml
 left to right direction
 
-' === Actors (ordered to reduce crossings) ===
+' --- Increase spacing and make the box larger ---
+skinparam ranksep 40
+skinparam nodesep 30
+skinparam rectangle {
+  Padding 40
+  Margin 40
+}
+
 actor Advertiser as ADV
 actor "Media Owner" as MO
 actor Admin as ADM
+ADV -[hidden]-> MO
+MO  -[hidden]-> ADM
 
 rectangle "Envision Ad" {
 
   ' --- Advertiser use cases ---
   usecase "Browse Media Inventory" as Browse
-  usecase "Preview Ad on Media" as Preview
+  ' usecase "Preview Ad on Media" as Preview
   usecase "Submit Ad for Approval" as Submit
   usecase "Make Ad Payment" as Pay
+  usecase "Confirm Proof of Display" as ConfirmProof
 
   ' --- Media Owner use cases ---
   usecase "Manage Media Listing" as ManageListing
   usecase "List Media" as ListMedia
   usecase "Approve/Deny Ad" as ApproveAd
-  usecase "Display Ad on Media" as DisplayAd
+  usecase "Publish Ad on Media" as PublishAd
   usecase "Provide Proof of Display" as Proof
-  usecase "Confirm Proof of Display" as ConfirmProof
+  usecase "View Ad Requests/History" as ViewAd
 
   ' --- Admin use cases ---
   usecase "Approve/Deny Media Listing" as ApproveListing
-  usecase "Manage Users" as ManageUsers
   usecase "Issue Content Warning" as ContentWarning
+  usecase "Approve/Deny New Advertiser Account" as ApproveAccount
+  usecase "View Admin Dashboard" as AdminDashboard
 
-  ' --- Notes placed near their targets ---
+  ' --- Note ---
   note right of ConfirmProof
   <b>Precondition</b>
   Proof of display must be first
   provided by the Media Owner
   end note
 
-  note right of DisplayAd
-  <b>Precondition</b>
-  Ad must be approved
-  by Media Owner
-  end note
-
-  ' --- Actor connections ---
+  ' --- Actor connections (solid lines) ---
   ADV -- Browse
-  ADV -- Preview
   ADV -- Submit
   ADV -- ConfirmProof
 
-  MO -- ManageListing
-  MO -- ListMedia
+  ' keep media owner lines inside rectangle
+  MO -[hidden]-> ApproveAd
+  MO -[hidden]-> Proof
   MO -- ApproveAd
-  MO -- DisplayAd
-  MO -- Proof
+  MO -- ViewAd
+  MO -- ManageListing
 
   ADM -- ApproveListing
-  ADM -- ManageUsers
   ADM -- ContentWarning
+  ADM -- ApproveAccount
+  ADM -- AdminDashboard
 
-  ' --- Relationships ---
-  Submit ..> Pay : <<extend>>
-  Proof ..> ConfirmProof : <<extend>>
-  Submit ..> ApproveAd : <<extend>>
+  ' --- Relationships (dotted, no arrows, all contained) ---
+  ConfirmProof <.. Pay     : <<include>>
+  Submit ..> ApproveAd     : <<extend>>
+  ConfirmProof <.. Proof   : <<include>>
+  ApproveAd <.. Proof      : <<include>>
+  ManageListing ..> ListMedia : <<extend>>
+  ManageListing ..> PublishAd : <<extend>>
 }
 @enduml

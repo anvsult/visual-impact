@@ -1,0 +1,238 @@
+@startuml
+!theme plain
+hide circle
+top to bottom direction
+!pragma useVerticalIf on
+skinparam dpi 350
+skinparam packageStyle rectangle
+skinparam rectangle {
+  BackgroundColor #f7f4eb
+  BorderColor Black
+}
+
+' === DDD DEFINITIONS ===
+!define ENTITY(e) class e <<Entity>>
+!define AGGREGATE(a) class a <<Aggregate>>
+!define AGGREGATE_ROOT(ar) class ar <<Aggregate Root>>
+!define VALUE_OBJECT(vo) class vo <<Value Object>>
+!define ENUM(enum) class enum <<Enum>>
+
+title Envision Ad Platform - Domain Driven Design Context Map
+
+' ===============================
+' Media OWNER MANAGEMENT
+' ===============================
+package "Media Owner Management Subdomain" #LightGreen {
+  AGGREGATE_ROOT(MediaOwner) #LightBlue {
+    userId: UUID
+    businessName: String
+  }
+
+  AGGREGATE_ROOT(MediaAsset) #LightBlue {
+    title: String
+    estimatedWeeklyViews: Int
+    pricePerWeek: Decimal
+    width: Float
+    height: Float
+    image: URL
+    mediaCorners: double[4]
+  }
+
+  ENTITY(MediaType) #LightBlue {
+    mediaTypeId: UUID
+    name: String
+    description: String
+  }
+
+  ENUM(Status) #Orange {
+    ACTIVE
+    INACTIVE
+    PENDING
+    REJECTED
+  }
+
+  VALUE_OBJECT(MediaIdentifier) #Bisque {
+    mediaId: UUID
+  }
+
+  VALUE_OBJECT(MediaLocation) #Bisque {
+    latitude: Float
+    longitude: Float
+    address: String
+  }
+
+  VALUE_OBJECT(RevenueSummary) #Bisque {
+    totalRevenue: Decimal
+    lastPaymentDate: Date
+  }
+
+  MediaOwner "1" o--> "1..*" MediaAsset
+  MediaOwner "1" o--> "1..*" RevenueSummary
+  MediaAsset "1" o--> "1..*" MediaLocation
+  MediaAsset "1" o--> "1" MediaIdentifier
+  MediaAsset "1" o--> "1" MediaType
+  MediaAsset "1" o--> "1" Status
+}
+
+' ===============================
+' ADVERTISEMENT & BOOKING
+' ===============================
+package "Advertisement Subdomain" #LightCoral {
+  AGGREGATE_ROOT(AdvertisementCampaign) #LightBlue {
+    startDate: Date
+    endDate: Date
+    budget: Decimal
+  }
+
+  AGGREGATE_ROOT(Advertiser) #LightBlue {
+    userId: UUID
+    Budget: Decimal
+    Employees: Int
+  }
+
+  VALUE_OBJECT(Verification) #Bisque {
+    verified: Boolean
+    verifiedDate: Date
+  }
+
+  ENTITY(Advertisement) #LightBlue {
+    placementId: UUID
+    screenTimeMinutes: Int
+    cost: Decimal
+    approvedByOwner: Boolean
+  }
+
+  ENUM(Status) #Orange {
+    ACTIVE
+    PENDING
+    REJECTED
+    EXPIRED
+  }
+
+  VALUE_OBJECT(AdIdentifier) #Bisque {
+    adId: UUID
+  }
+
+  Advertiser "1" o--> "1" Verification
+  Advertiser "1" o--> "0..*" AdvertisementCampaign
+  AdvertisementCampaign "1" o--> "1" AdIdentifier
+  AdvertisementCampaign "1" o--> "1..*" Advertisement
+  AdvertisementCampaign "1" o--> "1" Status
+}
+
+' ===============================
+' TRANSACTIONS
+' ===============================
+package "Transactions Subdomain" #LightPink {
+  AGGREGATE_ROOT(Transaction) #LightBlue {
+    companyName: String
+    amount: Decimal
+    timestamp: DateTime
+  }
+
+  ENTITY(Invoice) #LightBlue {
+    invoiceId: UUID
+    dueDate: Date
+    paid: Boolean
+  }
+
+   ENUM(Status) #Orange {
+     SUCCESS
+     PENDING
+     FAILED
+   }
+
+  VALUE_OBJECT(TransactionIdentifier) #Bisque {
+    transactionId: UUID
+  }
+
+  VALUE_OBJECT(BillingAddress) #Bisque {
+    street : String
+    city : String
+    province : String
+    postalCode : String
+  }
+
+  Transaction "1" o--> "1" BillingAddress
+  Transaction "1" o--> "1" Invoice
+  Transaction "1" o--> "1" TransactionIdentifier
+  Transaction "1" o--> "1" Status
+}
+
+' ===============================
+' ADMIN & MODERATION
+' ===============================
+package "Admin & Moderation Subdomain" #LightCyan {
+  AGGREGATE_ROOT(Admin) #LightBlue {
+    userId: UUID
+  }
+
+  ENTITY(VerificationRequest) #LightBlue {
+    requestId: UUID
+    advertiserId: UUID
+    submittedDocs: URL
+  }
+
+  ENTITY(ContentModeration) #LightBlue {
+    moderationId: UUID
+    mediaId: UUID
+    reason: String
+  }
+
+ ENUM(Status) #Orange {
+     PENDING
+     APPROVED
+     REJECTED
+   }
+
+   ENUM(Decision) #Orange {
+        ACCEPTED
+        DENIED
+      }
+
+  Admin o--> VerificationRequest
+  Admin o--> ContentModeration
+  VerificationRequest o--> Status
+  ContentModeration o--> Decision
+}
+
+' ===============================
+' REPORTING & ANALYTICS
+' ===============================
+package "Reporting Subdomain" #LightGray {
+  AGGREGATE_ROOT(Report) #LightBlue {
+    reportId: UUID
+    generatedAt: DateTime
+  }
+
+  ENTITY(ReportData) #LightBlue {
+    dataId: UUID
+    metricId: UUID
+    value: String
+  }
+
+  ENTITY(Metrics) #LightBlue {
+    metricId: UUID
+    name: String
+    description: String
+  }
+
+  Report "1" o--> "1..*" ReportData
+  ReportData "1" o--> "1" Metrics
+}
+
+'===============================
+' SUBDOMAIN CONNECTIONS (cross-package)
+'===============================
+' These associations connect aggregates/entities across subdomains to show interactions like bookings, payments, moderation and reporting.
+AdvertisementCampaign "0..*" o--> "1" MediaAsset : "books"
+Advertisement "1" o--> "1" MediaOwner : "approvedByOwner"
+Transaction "1" o--> "1" AdvertisementCampaign : "payment_for"
+Transaction "1" o--> "1" MediaOwner : "payout_to"
+VerificationRequest "1" o--> "1" Advertiser : "request_for"
+ContentModeration "1" o--> "1" MediaAsset : "moderates"
+Report "1" o--> "0..*" AdvertisementCampaign : "includes"
+Report "1" o--> "0..*" Transaction : "includes"
+Report "1" o--> "0..*" MediaAsset : "includes"
+
+@enduml
