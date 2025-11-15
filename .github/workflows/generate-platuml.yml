@@ -1,5 +1,7 @@
 name: generate plantuml
 on: push
+permissions:
+  contents: write
 jobs:
   generate_plantuml:
     runs-on: ubuntu-latest
