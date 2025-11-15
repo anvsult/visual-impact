@@ -18,38 +18,44 @@ rectangle "Envision Ad" {
   ' --- Advertiser use cases ---
   usecase "Browse Media Inventory" as Browse
   ' usecase "Preview Ad on Media" as Preview
-  usecase "Ad Request" as Request
-  usecase "Make Ad Payment" as Pay
-  usecase "Confirm Proof of Display" as ConfirmProof
+  ' Extracted use case into another diagram "Publish Ad"
+  usecase "Publish Ad" as PublishAd
+'  usecase "Make Ad Payment" as Pay
+'  usecase "Confirm Proof of Display" as ConfirmProof
 
   ' --- Media Owner use cases ---
   usecase "Manage Media Listing" as ManageListing
   usecase "List Media" as ListMedia
-  usecase "Approve/Deny Ad" as ApproveAd
-  usecase "Publish Ad on Media" as PublishAd
-  usecase "Provide Proof of Display" as Proof
+'  usecase "Approve/Deny Ad" as ApproveAd
+'  usecase "Publish Ad on Media" as PublishAdOnMedia
+'  usecase "Provide Proof of Display" as Proof
   usecase "View Ad Requests/History" as ViewAd
 
   ' --- Admin use cases ---
   usecase "Approve/Deny Media Listing" as ApproveListing
   usecase "Issue Content Warning" as ContentWarning
 
-  ' --- Note ---
-  note right of ConfirmProof
-  <b>Precondition</b>
-  Proof of display must be first
-  provided by the Media Owner
-  end note
+note right of PublishAd
+  Detailed in separate diagram:
+  "Publish Ad – Use Case Detail"
+end note
 
+'  ' --- Note ---
+'  note right of ConfirmProof
+'  <b>Precondition</b>
+'  Proof of display must be first
+'  provided by the Media Owner
+'  end note
+'
   ' --- Actor connections (solid lines) ---
   ADV -- Browse
-  ADV -- Request
-  ADV -- ConfirmProof
+  ADV -- PublishAd
+'  ADV -- ConfirmProof
 
   ' keep media owner lines inside rectangle
-  MO -[hidden]-> ApproveAd
-  MO -[hidden]-> Proof
-  MO -- ApproveAd
+'  MO -[hidden]-> ApproveAd
+'  MO -[hidden]-> Proof
+'  MO -- ApproveAd
   MO -- ViewAd
   MO -- ManageListing
 
@@ -57,11 +63,11 @@ rectangle "Envision Ad" {
   ADM -- ContentWarning
 
   ' --- Relationships (dotted, no arrows, all contained) ---
-  ConfirmProof <-- Pay     : <<includes>>
-  Request <-- ApproveAd     : <<extends>>
-  ConfirmProof <-- Proof   : <<includes>>
-  ApproveAd <-- Proof      : <<includes>>
+'  PublishAd <-- Pay     : <<includes>>
+'  Request <-- ApproveAd     : <<extends>>
+'  ConfirmProof <-- Proof   : <<includes>>
+'  ApproveAd <-- Proof      : <<includes>>
   ManageListing <-- ListMedia : <<extends>>
-  ManageListing <-- PublishAd : <<extends>>
+'  ManageListing <-- PublishAdOnMedia : <<extends>>
 }
 @enduml

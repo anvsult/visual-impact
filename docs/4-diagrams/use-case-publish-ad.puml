@@ -13,11 +13,12 @@ actor Advertiser as ADV
 actor "Media Owner" as MO
 
 
-rectangle "Envision Ad" {
+rectangle "Publish Ad" {
 ' --- Advertiser use cases ---
   ' usecase "Preview Ad on Media" as Preview
   usecase "Submit Ad for Approval" as Submit
   usecase "Confirm Proof of Display" as ConfirmProof
+  usecase "Make Ad Payment" as Pay
 
   ' --- Media Owner use cases ---
   usecase "Approve/Deny Ad" as ApproveAd
@@ -27,6 +28,7 @@ rectangle "Envision Ad" {
   ' --- Actor connections (solid lines) ---
   ADV -- Submit
   ADV -- ConfirmProof
+  ADV -- Pay
 
   ' keep media owner lines inside rectangle
 '  MO -[hidden]-> ApproveAd
@@ -40,5 +42,6 @@ rectangle "Envision Ad" {
   ApproveAd <.. PublishAd   : <<extends>>
   ConfirmProof ..> Proof   : <<includes>>
   Proof ..> PublishAd : <<extends>>
+  Pay ..> ConfirmProof : <<extends>>
 }
 @enduml
