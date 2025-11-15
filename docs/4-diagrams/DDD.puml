@@ -28,7 +28,7 @@ package "Media Owner Management Subdomain" #LightGreen {
     businessName: String
   }
 
-  AGGREGATE_ROOT(MediaAsset) #LightBlue {
+  ENTITY(MediaAsset) #LightBlue {
     title: String
     estimatedWeeklyViews: Int
     pricePerWeek: Decimal
@@ -234,5 +234,4 @@ ContentModeration "1" o--> "1" MediaAsset : "moderates"
 Report "1" o--> "0..*" AdvertisementCampaign : "includes"
 Report "1" o--> "0..*" Transaction : "includes"
 Report "1" o--> "0..*" MediaAsset : "includes"
-
 @enduml
