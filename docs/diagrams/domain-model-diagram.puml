@@ -20,15 +20,10 @@ skinparam rectangle {
 title Envision Ad Platform - Domain Driven Design Domain Model
 
 ' ===============================
-' Media OWNER
+' Media
 ' ===============================
-package "Media Owner Subdomain" #LightGreen {
-  AGGREGATE_ROOT(MediaOwner) #LightBlue {
-    userId: UUID
-    businessName: String
-  }
-
-  AGGREGATE(MediaAsset) #LightBlue {
+package "Media Subdomain" #LightGreen {
+  AGGREGATE_ROOT(MediaAsset) #LightBlue {
     title: String
     estimatedWeeklyViews: Int
     pricePerWeek: Decimal
@@ -64,13 +59,6 @@ package "Media Owner Subdomain" #LightGreen {
     address: String
   }
 
-  VALUE_OBJECT(RevenueSummary) #Bisque {
-    totalRevenue: Decimal
-    lastPaymentDate: Date
-  }
-
-  MediaOwner "1" o--> "1..*" MediaIdentifier
-  MediaOwner "1" o--> "1..*" RevenueSummary
   MediaType "1" o--> "1" MediaTypeIdentifier
   MediaAsset "1" o--> "1..*" MediaLocation
   MediaAsset "1" o--> "1" MediaIdentifier
@@ -81,22 +69,11 @@ package "Media Owner Subdomain" #LightGreen {
 ' ===============================
 ' Advertiser
 ' ===============================
-package "Advertiser Subdomain" #LightCoral {
+package "Advertising Subdomain" #LightCoral {
   AGGREGATE(AdvertisementCampaign) #LightBlue {
     startDate: Date
     endDate: Date
     budget: Decimal
-  }
-
-  AGGREGATE_ROOT(Advertiser) #LightBlue {
-    userId: UUID
-    Budget: Decimal
-    Employees: Int
-  }
-
-  VALUE_OBJECT(Verification) #Bisque {
-    verified: Boolean
-    verifiedDate: Date
   }
 
   AGGREGATE(Advertisement) #LightBlue {
@@ -121,8 +98,6 @@ package "Advertiser Subdomain" #LightCoral {
     adCampaignId: UUID
   }
 
-  Advertiser "1" o--> "1" Verification
-  Advertiser "1" o--> "0..*" AdCampaignIdentifier
   AdvertisementCampaign "1" o--> "1" AdCampaignIdentifier
   AdvertisementCampaign "1" o--> "1..*" AdIdentifier
   AdvertisementCampaign "1" o--> "1" Status
