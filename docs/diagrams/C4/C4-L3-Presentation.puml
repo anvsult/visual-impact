@@ -1,0 +1,90 @@
+ @startuml
+    !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+    !define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+    !include DEVICONS/java.puml
+    !include DEVICONS/html5.puml
+
+    !define DEVICONS2 https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons2
+    !include DEVICONS2/npm_original_wordmark.puml
+    !include DEVICONS2/typescript.puml
+    !include DEVICONS2/javascript.puml
+
+    allowmixing
+    SetDefaultLegendEntries("")
+
+!theme plain
+
+AddElementTag("java", $shape=EightSidedShape(), $bgColor="Green", $fontColor="white", $legendText="Java File \neight sided")
+AddElementTag("typescript", $shape=RoundedBoxShape(), $bgColor="DodgerBlue", $fontColor="white", $legendText="TSX File")
+AddElementTag("html", $shape=RoundedBoxShape(), $bgColor="OrangeRed", $fontColor="white", $legendText="HTML Files")
+AddElementTag("npm_libraries", $shape=EightSidedShape(), $bgColor="Red", $fontColor="white" ,$legendText="NPM Libraries\neight sided")
+AddElementTag("TSX_component", $shape=EightSidedShape(), $bgColor="Blue", $fontColor="white" ,$legendText="TSX Component\neight sided")
+
+
+    rectangle "React Application" as frontend #line.dashed {
+            'pages'
+            Container(indexHtml, "Index.html", "HTML", "React Landing page for the user, contains all the scripts.", $sprite="html5", $tags="html")
+            Container(indexJs, "Index.js", "Component: React Component", "React entry point, contains all the components.", $sprite="javascript", $tags="typescript")
+            Container(appJs, "App.js", "Component: React Component", "Main component, contains will be empty because of React Router.", $sprite="javascript", $tags="typescript")
+            Container(layout, "layout.tsx", "Component: React Component", "Layout director.", $sprite="typescript", $tags="typescript")
+            Container(mediaOwnerDashboard, "mediaOwnerDashboard.tsx", "Component: React Component", "Media Owner dashboard page.", $sprite="typescript", $tags="TypeScript")
+            Container(advertiserDashboard, "advertiserDashboard.tsx", "Component: React Component", "Advertiser dashboard page.", $sprite="typescript", $tags="TypeScript")
+            Container(adminDashboard, "adminDashboard.tsx", "Component: React Component", "Admin dashboard page.", $sprite="typescript", $tags="TypeScript")
+            Container(browseMedia, "browseMedia.tsx", "Component: React Component", "Media browsing page.", $sprite="typescript", $tags="TypeScript")
+            Container(mediaDetails, "mediaDetails.tsx", "Component: React Component", "Media details page.", $sprite="typescript", $tags="TypeScript")
+            Container(reactRouter, "React Router", "Library: NPM Library", "Allows the user to navigate through the website.", $sprite="npm_original_wordmark", $tags="npm_libraries")
+            Container(axios, "Axios", "Library: NPM Library", "Allows the user to make HTTP requests.", $sprite="npm_original_wordmark", $tags="npm_libraries")
+            Container(home, "home.tsx", "Component: React Component", "Home page.", $sprite="typescript", $tags="typescript")
+            Container(login, "login.tsx", "Component: React Component", "Login page.", $sprite="typescript", $tags="typescript")
+            Container(register, "register.tsx", "Component: React Component", "Register page.", $sprite="typescript", $tags="typescript")
+
+            'components'
+            Container(nav, "nav.tsx", "Component: React Component", "Navigation bar component.", $sprite="typescript", $tags="TSX_component")
+            Container(footer, "footer.tsx", "Component: React Component", "Footer component.", $sprite="typescript", $tags="TSX_component")
+            Container(newMedia, "newMedia.tsx", "Component: React Component", "Modal to Reserve a new Media.", $sprite="typescript", $tags="TSX_component")
+            Container(reserveMedia, "reserveMedia.tsx", "Component: React Component", "Modal to add a new media.", $sprite="typescript", $tags="TSX_component")
+
+            'links'
+            indexHtml -[dashed]-> indexJs  : **Imports**
+
+            indexJs -[dashed]-> appJs  : **Imports**
+            indexJs -[dashed]-> layout  : **Imports**
+            indexJs -[dashed]-> appJs  : **Imports**
+            indexJs -[dashed]-> login  : **Imports**
+            indexJs -[dashed]-> register  : **Imports**
+            indexJs -[dashed]-> home  : **Imports**
+            indexJs -[dashed]-> mediaOwnerDashboard  : **Imports**
+            indexJs -[dashed]-> advertiserDashboard  : **Imports**
+            indexJs -[dashed]-> adminDashboard  : **Imports**
+            indexJs -[dashed]-> browseMedia  : **Imports**
+            indexJs -[dashed]-> mediaDetails  : **Imports**
+
+            layout -[dashed]-> nav  : **Imports**
+            layout -[dashed]-> footer  : **Imports**
+            mediaOwnerDashboard -[dashed]-> newMedia : **Imports**
+            mediaDetails -[dashed]-> reserveMedia  : **Imports**
+
+            login -[dashed]-> axios  : **Imports**
+            register -[dashed]-> axios  : **Imports**
+            mediaOwnerDashboard -[dashed]-> axios  : **Imports**
+            newMedia -[dashed]-> axios  : **Imports**
+            reserveMedia -[dashed]-> axios  : **Imports**
+            advertiserDashboard -[dashed]-> axios  : **Imports**
+            adminDashboard -[dashed]-> axios  : **Imports**
+
+            appJs -[dashed]-> reactRouter  : **Imports**
+            nav -[dashed]-> reactRouter  : **Imports**
+            login -[dashed]-> reactRouter  : **Imports**
+            register -[dashed]-> reactRouter  : **Imports**
+            browseMedia -[dashed]-> reactRouter  : **Imports**
+    }
+
+AddElementTag("service", $shape=EightSidedShape(), $bgColor="Green", $fontColor="white", $legendText="API \neight sided")
+
+Container(api, "API", "REST API", "API for the Corso System.", $sprite="java", $tags="service")
+
+axios -[dashed]------> api  : **Makes API Call**\n[HTTPS/JSON]
+
+
+SHOW_LEGEND()
+@enduml
