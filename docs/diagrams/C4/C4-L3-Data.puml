@@ -1,0 +1,187 @@
+ @startuml
+    !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+    !include https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons/java.puml
+
+    allowmixing
+    SetDefaultLegendEntries("")
+
+!theme plain
+hide empty methods
+
+!procedure $table($name, $slug)
+entity "<b>$name</b>" as $slug << (T, Orange) table >>
+!endprocedure
+
+!procedure $pk($name)
+<color:#GoldenRod><&key></color> <b>$name</b>
+!endprocedure
+
+!procedure $fk($name)
+<color:#Silver><&key></color> $name
+!endprocedure
+
+!procedure $column($name)
+{field} $name
+!endprocedure
+
+database  "MySQL Database" as Database #DarkCyan {
+                  $table("Media Asset", "media_asset_tb") {
+                        $pk("id"): INT NOT NULL AUTO_INCREMENT
+                        ---
+                        $fk("user_id"): VARCHAR(36) NOT NULL
+
+                        $fk("media_type_id"): VARCHAR(36) NOT NULL
+                        ---
+                        $column("media_id"): VARCHAR(36) NOT NULL
+
+                        $column("name"): VARCHAR() NOT NULL
+
+                        $column("description"): VARCHAR() NOT NULL
+
+                        $column("price"): DECIMAL(10, 2) NOT NULL
+
+                        $column("estimate_view"): INT
+
+                        $column("height"): DECIMAL(10, 2) NOT NULL
+
+                        $column("width"): DECIMAL(10, 2) NOT NULL
+
+                        $column("height"): DECIMAL(10, 2) NOT NULL
+
+                        $column("image"): VARCHAR(500) NOT NULL
+
+                        $column("corner_1"): DOUBLE
+
+                        $column("corner_2"): DOUBLE
+
+                        $column("corner_3"): DOUBLE
+
+                        $column("corner_4"): DOUBLE
+
+                        $column("latitude"): FLOAT NOT NULL
+
+                        $column("longitude"): FLOAT NOT NULL
+
+                        $column("address"): VARCHAR(255) NOT NULL
+                  }
+
+                  $table("Media Type", "media_type_tb") {
+                        $pk("id"): INT NOT NULL AUTO_INCREMENT
+                        ---
+                        $column("media_type_id"): VARCHAR(36) NOT NULL
+
+                        $column("name"): VARCHAR(50) NOT NULL
+
+                        $column("description"): VARCHAR(255) NOT NULL
+                  }
+
+                  $table("Advertisement Campaign", "advertisement_campaign_tb") {
+                        $pk("id"): VARCHAR(36) NOT NULL
+                        ---
+                        $fk("user_id"): VARCHAR(36) NOT NULL
+
+                        $fk("campaign_identifier_id"): VARCHAR(36) NOT NULL
+                        ---
+                        $column("start_date"): DATE NOT NULL
+
+                        $column("end_date"): DATE NOT NULL
+
+                        $column("budget"): DECIMAL(10,2) NOT NULL
+
+                        $column("status"): VARCHAR(25) NOT NULL
+                  }
+
+                  $table("Advertisement", "advertisement_tb") {
+                        $pk("id"): VARCHAR(36) NOT NULL
+                        ---
+                        $fk("ad_identifier_id"): VARCHAR(36) NOT NULL
+
+                        $fk("campaign_identifier_id") VARCHAR(36) NOT NULL
+                        ---
+                        $column("media_id"): VARCHAR(36) NOT NULL
+
+                        $column("screen_time_minutes"): INT NOT NULL
+
+                        $column("cost"): DECIMAL(10,2) NOT NULL
+
+                        $column("approved_by_owner"): BOOLEAN NOT NULL
+                  }
+
+                  $table("Transaction", "transaction_tb") {
+                        $pk("id"): VARCHAR(36) NOT NULL
+                        ---
+                        $fk("user_id"): VARCHAR(36) NOT NULL
+                        ---
+                        $column("transaction_id"): VARCHAR(36) NOT NULL
+
+                        $column("amount"): DECIMAL(10,2) NOT NULL
+
+                        $column("status"): VARCHAR(25) NOT NULL
+
+                        $column("timestamp"): DATETIME NOT NULL
+                  }
+
+                  $table("Invoice", "invoice_tb") {
+                        $pk("id"): VARCHAR(36) NOT NULL
+                        ---
+                        $fk("transaction_id") VARCHAR(36) NOT NULL
+                        ---
+                        $column("invoice_id") VARCHAR(36) NOT NULL
+
+                        $column("due_date"): DATETIME NOT NULL
+
+                        $column("paid"): BOOLEAN NOT NULL
+                  }
+
+                  $table("User Report", "user_report_tb") {
+                      $pk("id"): VARCHAR(36) NOT NULL
+                      ---
+                      $fk("user_id"): VARCHAR(36) NOT NULL
+                      ---
+                      $column("user_report_id"): VARCHAR(36) NOT NULL
+
+                      $column("reason"): VARCHAR(255) NOT NULL
+
+                      $column("description"): VARCHAR(255) NOT NULL
+
+                      $column("proof"): VARCHAR(500)
+
+                      $column("status"): VARCHAR(25) NOT NULL
+                  }
+
+                $table("Report", "report_tb") {
+                    $pk("id"): VARCHAR(36) NOT NULL
+                    ---
+                    $fk("user_id"): VARCHAR(36) NOT NULL
+                    ---
+                    $column("report_id"): VARCHAR(36) NOT NULL
+
+                    $column("generated_at"): DATETIME NOT NULL
+                }
+
+                $table("Report Data", "report_data_tb") {
+                    $pk("id"): VARCHAR(36) NOT NULL
+                    ---
+                    $fk("report_id"): VARCHAR(36) NOT NULL
+                    ---
+                    $column("report_data_id"): VARCHAR(36) NOT NULL
+
+                    $column("value"): VARCHAR(255) NOT NULL
+
+                    $column("name"): VARCHAR(255) NOT NULL
+
+                    $column("description"): VARCHAR(255)
+                }
+
+                "media_asset_tb" |o--o| "media_type_tb"
+                "transaction_tb" |o--o| "invoice_tb"
+                "report_tb" |o--o{ "report_data_tb"
+                "advertisement_campaign_tb" |o--o{ "advertisement_tb"
+}
+
+AddElementTag("service", $shape=EightSidedShape(), $bgColor="Green", $fontColor="white", $legendText="API \neight sided")
+
+Container(api, "API", "REST API", "API for the Corso System.", $sprite="java", $tags="service")
+
+api -[dashed]-> Database : **SQL/TCP** \n[JBDC]
+@enduml

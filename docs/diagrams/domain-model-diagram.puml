@@ -27,8 +27,8 @@ package "Media Subdomain" #LightGreen {
     title: String
     estimatedWeeklyViews: Int
     pricePerWeek: Decimal
-    width: Float
-    height: Float
+    width: Decimal
+    height: Decimal
     image: URL
     mediaCorners: double[4]
   }
@@ -60,7 +60,7 @@ package "Media Subdomain" #LightGreen {
   }
 
   MediaType "1" o--> "1" MediaTypeIdentifier
-  MediaAsset "1" o--> "1..*" MediaLocation
+  MediaAsset "1" o--> "1" MediaLocation
   MediaAsset "1" o--> "1" MediaIdentifier
   MediaAsset "1" o--> "1" MediaTypeIdentifier
   MediaAsset "1" o--> "1" Status
@@ -70,7 +70,7 @@ package "Media Subdomain" #LightGreen {
 ' Advertiser
 ' ===============================
 package "Advertising Subdomain" #LightCoral {
-  AGGREGATE(AdvertisementCampaign) #LightBlue {
+  AGGREGATE_ROOT(AdvertisementCampaign) #LightBlue {
     startDate: Date
     endDate: Date
     budget: Decimal
@@ -133,14 +133,6 @@ package "Transactions Subdomain" #LightPink {
     invoiceId: UUID
   }
 
-  VALUE_OBJECT(BillingAddress) #Bisque {
-    street : String
-    city : String
-    province : String
-    postalCode : String
-  }
-
-  Transaction "1" o--> "1" BillingAddress
   Transaction "1" o--> "1" InvoiceIdentifier
   Transaction "1" o--> "1" TransactionIdentifier
   Transaction "1" o--> "1" Status
@@ -151,21 +143,11 @@ package "Transactions Subdomain" #LightPink {
 ' MODERATION
 ' ===============================
 package "Moderation Subdomain" #LightCyan {
-  ENTITY(VerificationRequest) #LightBlue {
-    userId: UUID
-    submittedDocs: URL
-  }
-
-  AGGREGATE(UserReport) #LightBlue {
+  AGGREGATE_ROOT(UserReport) #LightBlue {
     userId: UUID
     reason: String
     description: String
     proof: URL
-  }
-
-  ENTITY(ContentModeration) #LightBlue {
-    mediaId: UUID
-    reason: String
   }
 
   ENUM(Status) #Orange {
@@ -174,22 +156,10 @@ package "Moderation Subdomain" #LightCyan {
     REJECTED
   }
 
-   VALUE_OBJECT(ContentModerationIdentifier) #Bisque {
-     contentModerationId: UUID
-   }
-
    VALUE_OBJECT(UserReportIdentifier) #Bisque {
      userReportId: UUID
    }
 
-   VALUE_OBJECT(VerificationRequestIdentifier) #Bisque {
-     verificationRequestId: UUID
-   }
-
-  VerificationRequest "1" o--> "1" VerificationRequestIdentifier
-  VerificationRequest "1" o--> "1" Status
-  ContentModeration "1" o--> "1" ContentModerationIdentifier
-  ContentModeration "1" o--> "1" Status
   UserReport "1" o--> "1" UserReportIdentifier
   UserReport "1" o--> "1" Status
 }
