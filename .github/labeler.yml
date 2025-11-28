@@ -91,6 +91,4 @@ chore:
 
 assets:
   - changed-files:
-      - any-glob-to-any-file: 'frontend/public/**'
       - any-glob-to-any-file: 'docs/assets/**'
-
