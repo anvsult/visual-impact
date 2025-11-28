@@ -7,11 +7,11 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     hikari:
       maximum-pool-size: 10
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: validate        # use `update` only for dev; prefer migrations
+    properties:
       hibernate:
-        ddl-auto: validate        # use `update` only for dev; prefer migrations
-      properties:
-        hibernate:
-          format_sql: false
-      show-sql: false
+        format_sql: false
+    show-sql: false
 
