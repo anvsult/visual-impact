@@ -7,6 +7,7 @@ import {
 } from "@mantine/core";
 import { josefinSans, lato, theme } from "../theme";
 import type { ReactNode } from "react";
+import Footer from "../components/Footer";
 
 // This will be used for SEO (Search Engine Optimization)
 export const metadata = {
@@ -30,7 +31,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          {children}
+          <Footer />
+        </MantineProvider>
       </body>
     </html>
   );
