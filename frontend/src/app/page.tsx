@@ -1,42 +1,84 @@
-import { AppShell, AppShellHeader, AppShellMain, AppShellNavbar, createTheme, MantineProvider } from '@mantine/core';
+"use client";
 
-const theme = createTheme({
-  colors: {
-    deepBlue: [
-      '#eef3ff', '#dce4f5', '#b9c7e2', '#94a8d0', '#748dc1',
-      '#5f7cb8', '#5474b4', '#44639f', '#39588f', '#2d4b81',
-    ],
-    blue: [
-      '#eef3ff', '#dee2f2', '#bdc2de', '#98a0ca', '#7a84ba',
-      '#6672b0', '#5c68ac', '#4c5897', '#424e88', '#364379',
-    ],
-  },
-  shadows: {
-    md: '1px 1px 3px rgba(0,0,0,.25)',
-    xl: '5px 5px 3px rgba(0,0,0,.25)',
-  },
-  headings: {
-    fontFamily: 'Roboto, sans-serif',
-    sizes: {
-      h1: { fontSize: '60px' },
-      h2: { fontSize: '40px' },
-    },
-  },
-  defaultRadius: 'lg',
-});
+import {
+  Container,
+  Stack,
+  Title,
+  Text,
+  Button,
+  Box,
+} from "@mantine/core";
+import Link from "next/link";
+import { NavBar } from "@/components/NavBar";
+import { Partners } from "@/components/Partners";
+import classes from "./page.module.css";
+import Image from "next/image";
 
-function Demo() {
+export default function HomePage() {
   return (
-    <MantineProvider theme={theme}>
-      <AppShell
-        header={{ height: 60 }}
-        navbar={{ width: 250, breakpoint: "sm" }}
-      >
-      <AppShellHeader>Header</AppShellHeader>
-      <AppShellNavbar>Navbar</AppShellNavbar>
-      <AppShellMain>Main content</AppShellMain>
-    </AppShell>
-    </MantineProvider>
+    <>
+      <NavBar />
+
+      {/* Hero Section */}
+      <Box className={classes.hero}>
+        {/* Background Image */}
+        <Box style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+          <Image
+            src="/images/homepage-eye-image.png"
+            alt="Eye background image, representing visual impact"
+            fill
+            style={{ objectFit: "cover" }}
+            priority
+          />
+        </Box>
+
+        {/* Content on top of background */}
+        {/* TODO Make these margin & padding values responsive instead of hard-coded */}
+        <Container
+          size="xl"
+          ml={{ base: 20, sm: 40, md: 80, lg: 160 }}
+          py={{ base: 40, sm: 60, md: 80 }}
+          style={{ position: "relative", zIndex: 1 }}
+        >
+          <Stack gap="xl">
+            <Stack gap="md">
+              <Title order={1} size="h1" fw={700} className={classes.heroTitle}>
+                Affordable ads.
+              </Title>
+              <Title order={1} size="h1" fw={700} className={classes.heroTitle}>
+                Unforgettable impact.
+              </Title>
+            </Stack>
+
+            <Text size="lg" c="gray.7" className={classes.heroDescription}>
+                Discover affordable, high-impact advertising opportunities in your city.
+                Connect with local audiences through unique ad spaces and make your brand unforgettable.
+                Our platform makes it easy to browse, book, and manage ad placements that fit your budget and goals.
+            </Text>
+
+            <Box className={classes.ctaSection}>
+              <Title order={3} size="h3" fw={700} mb="md">
+                Find Ad Spaces Now
+              </Title>
+              <Link href="/browse">
+                <Button
+                  size="lg"
+                  radius="md"
+                  color="blue.6"
+                  className={classes.ctaButton}
+                >
+                  Browse
+                </Button>
+              </Link>
+            </Box>
+          </Stack>
+        </Container>
+      </Box>
+
+      {/* Partners Section */}
+      <Container size="xl" py={40}>
+        <Partners />
+      </Container>
+    </>
   );
 }
-export default Demo;
